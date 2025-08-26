@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카카오 페이증권 - 스마트 투자 플랫폼</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 390px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 100px;
+        }
+        
+        /* 상태바 */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px 0;
+            font-size: 16px;
+            font-weight: 600;
+            height: 44px;
+        }
+        
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .battery {
+            background: #ffffff;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* 헤더 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .logo-icon {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .logo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .dot-blue {
+            background: #4285f4;
+        }
+        
+        .dot-yellow {
+            background: #ffcd00;
+        }
+        
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .icon-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: none;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 18px;
+            position: relative;
+        }
+        
+        .notification-dot::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 6px;
+            background: #ff6b6b;
+            border-radius: 50%;
+        }
+        
+        /* 대시보드 포트폴리오 */
+        .dashboard-portfolio {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0 20px 20px;
+            border-radius: 20px;
+            padding: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portfolio-bg-pattern {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 15px 15px;
+            opacity: 0.3;
+        }
+        
+        .portfolio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .portfolio-title {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .settings-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .total-assets {
+            margin-bottom: 16px;
+        }
+        
+        .asset-amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .asset-change {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+        }
+        
+        .profit-amount {
+            color: #4caf50;
+        }
+        
+        .profit-rate {
+            background: rgba(76, 175, 80, 0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+        
+        .portfolio-summary {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .summary-item {
+            text-align: center;
+        }
+        
+        .summary-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+        
+        .summary-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* 실시간 미니 차트 */
+        .mini-chart {
+            width: 100%;
+            height: 60px;
+            margin: 16px 0;
+            position: relative;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(76,175,80,0.8) 0%, rgba(76,175,80,0.3) 100%);
+            clip-path: polygon(0% 80%, 15% 60%, 30% 75%, 45% 45%, 60% 55%, 75% 25%, 90% 35%, 100% 20%, 100% 100%, 0% 100%);
+            animation: chartGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes chartGlow {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        .chart-info {
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            font-size: 11px;
+            opacity: 0.9;
+        }
+        
+        /* 빠른 거래 */
+        .quick-trade {
+            margin: 0 20px 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .more-btn {
+            color: #888;
+            font-size: 14px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .trade-tabs {
+            display: flex;
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 16px;
+        }
+        
+        .trade-tab {
+            flex: 1;
+            padding: 12px 0;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            color: #888;
+        }
+        
+        .trade-tab.active {
+            background: #4285f4;
+            color: white;
+        }
+        
+        .stock-list {
+            background: #2a2a2a;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .stock-item {
+            padding: 16px;
+            border-bottom: 1px solid #3a3a3a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .stock-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stock-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .samsung {
+            background: #1f4e8c;
+        }
+        
+        .hynix {
+            background: #ff6b35;
+        }
+        
+        .kakao {
+            background: #ffcd00;
+            color: #000;
+        }
+        
+        .nvidia {
+            background: #76b900;
+        }
+        
+        .tesla {
+            background: #cc0000;
+        }
+        
+        .stock-info {
+            flex: 1;
+        }
+        
+        .stock-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .stock-price {
+            font-size: 13px;
+            color: #888;
+        }
+        
+        .stock-chart {
+            width: 60px;
+            height: 30px;
+            background: linear-gradient(45deg, #4caf50 0%, #81c784 100%);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            margin-right: 8px;
+        }
+        
+        .stock-chart.red {
+            background: linear-gradient(45deg, #f44336 0%, #ef5350 100%);
+        }
+        
+        .stock-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .trade-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .buy-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .sell-btn {
+            background: #4285f4;
+            color: white;
+        }
+        
+        .trade-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* AI 맞춤 추천 */
+        .ai-recommendation {
+            margin: 0 20px 20px;
+        }
+
+        .ai-insights-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .insight-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+        }
+
+        .insight-title {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .insight-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #4caf50;
+        }
+
+        .insight-desc {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        
+        .ai-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .ai-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .ai-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .ai-desc {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }
+        
+        .recommended-stocks {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .rec-stock {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .rec-stock-name {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        
+        .rec-stock-return {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4caf50;
+        }
+        
+        /* 실시간 트렌드 */
+        .trending {
+            margin: 0 20px 20px;
+        }
+        
+        .trending-content {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 20px;
+        }
+        
+        .trending-tabs {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .trending-tab {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+        
+        .trending-tab.active {
+            background: #4285f4;
+            color: white;
+        }
+        
+        .trending-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .trending-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .trending-rank {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .rank-number {
+            width: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: #4285f4;
+        }
+        
+        .trending-info {
+            flex: 1;
+        }
+        
+        .trending-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .trending-volume {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .trending-change {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .positive {
+            color: #ff6b6b;
+        }
+        
+        .negative {
+            color: #4285f4;
+        }
+        
+        /* 투자 미션 */
+        .investment-mission {
+            margin: 0 20px 20px;
+        }
+
+        .weekly-ranking {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 16px;
+            color: white;
+        }
+
+        .ranking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .my-rank {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .rank-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #81c784);
+            border-radius: 4px;
+            width: 73%;
+            animation: progressFill 1.5s ease-out;
+        }
+
+        @keyframes progressFill {
+            0% { width: 0%; }
+            100% { width: 73%; }
+        }
+
+        .progress-text {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .mission-content {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 20px;
+        }
+        
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .mission-badge {
+            background: #ffcd00;
+            color: #000;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .missions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        
+        .mission-item {
+            background: #3a3a3a;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .mission-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .mission-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .mission-reward {
+            font-size: 12px;
+            color: #ffcd00;
+        }
+        
+        /* 뉴스 & 인사이트 */
+        .news-insight {
+            margin: 0 20px 20px;
+        }
+
+        /* 카카오 생태계 연동 */
+        .kakao-ecosystem {
+            margin: 0 20px 20px;
+        }
+
+        .ecosystem-content {
+            background: linear-gradient(135deg, #ffcd00 0%, #ffd700 100%);
+            border-radius: 16px;
+            padding: 20px;
+            color: #000;
+        }
+
+        .ecosystem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .ecosystem-item {
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ecosystem-item:hover {
+            background: rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .ecosystem-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .ecosystem-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .ecosystem-desc {
+            font-size: 10px;
+            opacity: 0.7;
+        }
+
+        /* 소셜 투자 */
+        .social-investment {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+
+        .friends-list {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .friend-item {
+            min-width: 80px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .friend-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin: 0 auto 8px;
+            position: relative;
+        }
+
+        .friend-status {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #2a2a2a;
+        }
+
+        .online {
+            background: #4caf50;
+        }
+
+        .investing {
+            background: #ff6b6b;
+        }
+
+        .friend-name {
+            font-size: 11px;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .friend-profit {
+            font-size: 10px;
+            color: #4caf50;
+        }
+        
+        .news-content {
+            background: #2a2a2a;
+            border-radius: 16px;
+            padding: 20px;
+        }
+        
+        .news-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        
+        .news-item:last-child {
+            border-bottom: none;
+        }
+        
+        .news-thumbnail {
+            width: 60px;
+            height: 60px;
+            background: #4285f4;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .news-info {
+            flex: 1;
+        }
+        
+        .news-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        
+        .news-meta {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        /* 하단 네비게이션 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 390px;
+            background: #1a1a1a;
+            border-top: 1px solid #2a2a2a;
+            padding: 8px 0 30px;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #888;
+            font-size: 10px;
+            position: relative;
+        }
+        
+        .nav-item.active {
+            color: #4285f4;
+        }
+        
+        .nav-item .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        /* 홈 인디케이터 */
+        .home-indicator {
+            position: fixed;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: #ffffff;
+            border-radius: 2.5px;
+        }
+        
+        /* 애니메이션 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        /* 스크롤 최적화 */
+        .section {
+            will-change: transform;
+        }
+        
+        /* 반응형 */
+        @media (max-width: 350px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .dashboard-portfolio, .quick-trade, 
+            .ai-recommendation, .trending,
+            .investment-mission, .news-insight {
+                margin-left: 16px;
+                margin-right: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 상태바 -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span>10:09</span>
+                <span>🔇</span>
+            </div>
+            <div class="status-right">
+                <span>••••</span>
+                <span>5G</span>
+                <div class="battery">94</div>
+            </div>
+        </div>
+
+        <!-- 헤더 -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <div class="logo-dot dot-yellow"></div>
+                    <div class="logo-dot dot-blue"></div>
+                </div>
+                <span>카카오</span>
+                <span style="color: #ffcd00;">📱</span>
+                <span style="color: #4285f4;">페이증권</span>
+            </div>
+            <div class="header-icons">
+                <button class="icon-btn">🔍</button>
+                <button class="icon-btn notification-dot">🔔</button>
+                <button class="icon-btn">☰</button>
+            </div>
+        </header>
+
+        <!-- 대시보드 포트폴리오 -->
+        <div class="dashboard-portfolio section animate-in">
+            <div class="portfolio-bg-pattern"></div>
+            <div class="portfolio-header">
+                <div class="portfolio-title">내 투자 대시보드</div>
+                <button class="settings-btn">설정</button>
+            </div>
+            <div class="total-assets">
+                <div class="asset-amount">2,847,500원</div>
+                <div class="asset-change">
+                    <span class="profit-amount">+247,500원</span>
+                    <span class="profit-rate">+9.54%</span>
+                </div>
+            </div>
+            <!-- 실시간 미니 차트 -->
+            <div class="mini-chart">
+                <div class="chart-info">오늘 수익률 추이</div>
+                <div class="chart-line"></div>
+            </div>
+            
+            <div class="portfolio-summary">
+                <div class="summary-item">
+                    <div class="summary-label">총 투자금</div>
+                    <div class="summary-value">2,600,000원</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">보유 종목</div>
+                    <div class="summary-value">5개</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">오늘 수익</div>
+                    <div class="summary-value" style="color: #4caf50;">+18,200원</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 빠른 거래 -->
+        <div class="quick-trade section animate-in">
+            <div class="section-header">
+                <div class="section-title">빠른 거래</div>
+                <button class="more-btn">더보기 →</button>
+            </div>
+            <div class="trade-tabs">
+                <button class="trade-tab active">보유종목</button>
+                <button class="trade-tab">관심종목</button>
+            </div>
+            <div class="stock-list">
+                <div class="stock-item">
+                    <div class="stock-icon samsung">🏢</div>
+                    <div class="stock-info">
+                        <div class="stock-name">삼성전자</div>
+                        <div class="stock-price">71,500원</div>
+                    </div>
+                    <div class="stock-chart">+2.1%</div>
+                    <div class="stock-actions">
+                        <button class="trade-btn buy-btn">매수</button>
+                        <button class="trade-btn sell-btn">매도</button>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-icon hynix">💾</div>
+                    <div class="stock-info">
+                        <div class="stock-name">SK하이닉스</div>
+                        <div class="stock-price">145,000원</div>
+                    </div>
+                    <div class="stock-chart red">-1.2%</div>
+                    <div class="stock-actions">
+                        <button class="trade-btn buy-btn">매수</button>
+                        <button class="trade-btn sell-btn">매도</button>
+                    </div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-icon kakao">📱</div>
+                    <div class="stock-info">
+                        <div class="stock-name">카카오</div>
+                        <div class="stock-price">52,800원</div>
+                    </div>
+                    <div class="stock-chart">+0.8%</div>
+                    <div class="stock-actions">
+                        <button class="trade-btn buy-btn">매수</button>
+                        <button class="trade-btn sell-btn">매도</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI 맞춤 추천 -->
+        <div class="ai-recommendation section animate-in">
+            <div class="section-header">
+                <div class="section-title">AI 맞춤 추천</div>
+                <button class="more-btn">더보기 →</button>
+            </div>
+            <div class="ai-content">
+                <div class="ai-header">
+                    <div class="ai-badge">🤖 AI 분석</div>
+                </div>
+                <div class="ai-title">당신의 투자 성향에 맞는 종목</div>
+                <div class="ai-desc">보유 종목과 투자 패턴을 분석해 최적의 포트폴리오를 제안해드려요</div>
+                <div class="recommended-stocks">
+                    <div class="rec-stock">
+                        <div class="rec-stock-name">엔비디아</div>
+                        <div class="rec-stock-return">+42.3%</div>
+                    </div>
+                    <div class="rec-stock">
+                        <div class="rec-stock-name">테슬라</div>
+                        <div class="rec-stock-return">+18.7%</div>
+                    </div>
+                    <div class="rec-stock">
+                        <div class="rec-stock-name">애플</div>
+                        <div class="rec-stock-return">+12.4%</div>
+                    </div>
+                </div>
+                
+                <!-- AI 인사이트 카드 -->
+                <div class="ai-insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-title">승률</div>
+                        <div class="insight-value">87%</div>
+                        <div class="insight-desc">최근 30일</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-title">평균 수익률</div>
+                        <div class="insight-value">+12.4%</div>
+                        <div class="insight-desc">월 평균</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-title">리스크 등급</div>
+                        <div class="insight-value" style="color: #ffcd00;">중간</div>
+                        <div class="insight-desc">안정적</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-title">다음 목표</div>
+                        <div class="insight-value" style="color: #4285f4;">3M</div>
+                        <div class="insight-desc">18일 남음</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 실시간 트렌드 -->
+        <div class="trending section animate-in">
+            <div class="section-header">
+                <div class="section-title">실시간 트렌드</div>
+                <button class="more-btn">더보기 →</button>
+            </div>
+            <div class="trending-content">
+                <div class="trending-tabs">
+                    <button class="trending-tab active">인기종목</button>
+                    <button class="trending-tab">거래대금</button>
+                </div>
+                <div class="trending-list">
+                    <div class="trending-item">
+                        <div class="trending-rank">
+                            <div class="rank-number">1</div>
+                            <div class="trending-info">
+                                <div class="trending-name">엔비디아</div>
+                                <div class="trending-volume">거래량 1,234만</div>
+                            </div>
+                        </div>
+                        <div class="trending-change positive">+3.2%</div>
+                    </div>
+                    <div class="trending-item">
+                        <div class="trending-rank">
+                            <div class="rank-number">2</div>
+                            <div class="trending-info">
+                                <div class="trending-name">테슬라</div>
+                                <div class="trending-volume">거래량 987만</div>
+                            </div>
+                        </div>
+                        <div class="trending-change negative">-1.8%</div>
+                    </div>
+                    <div class="trending-item">
+                        <div class="trending-rank">
+                            <div class="rank-number">3</div>
+                            <div class="trending-info">
+                                <div class="trending-name">삼성전자</div>
+                                <div class="trending-volume">거래량 2,156만</div>
+                            </div>
+                        </div>
+                        <div class="trending-change positive">+1.7%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 투자 미션 -->
+        <div class="investment-mission section animate-in">
+            <div class="section-header">
+                <div class="section-title">투자 미션</div>
+                <div class="mission-badge">보상</div>
+            </div>
+            <div class="mission-content">
+                <div class="missions-grid">
+                    <div class="mission-item">
+                        <div class="mission-icon">📈</div>
+                        <div class="mission-title">첫 거래 완료</div>
+                        <div class="mission-reward">5,000포인트</div>
+                    </div>
+                    <div class="mission-item">
+                        <div class="mission-icon">⭐</div>
+                        <div class="mission-title">관심종목 등록</div>
+                        <div class="mission-reward">1,000포인트</div>
+                    </div>
+                    <div class="mission-item">
+                        <div class="mission-icon">🎯</div>
+                        <div class="mission-title">7일 연속 접속</div>
+                        <div class="mission-reward">10,000포인트</div>
+                    </div>
+                    <div class="mission-item">
+                        <div class="mission-icon">💎</div>
+                        <div class="mission-title">프리미엄 가입</div>
+                        <div class="mission-reward">수수료 할인</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 주간 랭킹 시스템 -->
+            <div class="weekly-ranking">
+                <div class="ranking-header">
+                    <div>
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 4px;">이번 주 내 순위</div>
+                        <div class="my-rank">#23</div>
+                    </div>
+                    <div class="rank-badge">상위 12%</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text">목표까지 73% 달성 • 다음 단계까지 2,150P</div>
+            </div>
+        </div>
+
+        <!-- 뉴스 & 인사이트 -->
+        <div class="news-insight section animate-in">
+            <div class="section-header">
+                <div class="section-title">뉴스 & 인사이트</div>
+                <button class="more-btn">더보기 →</button>
+            </div>
+            <div class="news-content">
+                <div class="news-item">
+                    <div class="news-thumbnail">📊</div>
+                    <div class="news-info">
+                        <div class="news-title">AI 반도체 투자 열풍, 지속 가능할까?</div>
+                        <div class="news-meta">투자 전문가 • 1시간 전</div>
+                    </div>
+                </div>
+                <div class="news-item">
+                    <div class="news-thumbnail" style="background: #ff6b6b;">📈</div>
+                    <div class="news-info">
+                        <div class="news-title">2024년 하반기 주식시장 전망</div>
+                        <div class="news-meta">시장 분석 • 3시간 전</div>
+                    </div>
+                </div>
+                <div class="news-item">
+                    <div class="news-thumbnail" style="background: #4caf50;">💡</div>
+                    <div class="news-info">
+                        <div class="news-title">ESG 투자의 새로운 기회</div>
+                        <div class="news-meta">지속가능투자 • 5시간 전</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 카카오 생태계 연동 -->
+        <div class="kakao-ecosystem section animate-in">
+            <div class="section-header">
+                <div class="section-title">카카오와 함께 투자하기</div>
+                <button class="more-btn">더보기 →</button>
+            </div>
+            <div class="ecosystem-content">
+                <div style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">🎯 스마트 투자 생활</div>
+                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 16px;">카카오 서비스와 연결해 더 스마트하게 투자하세요</div>
+                
+                <div class="ecosystem-grid">
+                    <div class="ecosystem-item" onclick="shareToKakaoTalk()">
+                        <div class="ecosystem-icon">💬</div>
+                        <div class="ecosystem-title">톡으로 공유</div>
+                        <div class="ecosystem-desc">수익 현황 공유</div>
+                    </div>
+                    <div class="ecosystem-item" onclick="connectKakaoPay()">
+                        <div class="ecosystem-icon">💳</div>
+                        <div class="ecosystem-title">페이 연결</div>
+                        <div class="ecosystem-desc">간편 입출금</div>
+                    </div>
+                    <div class="ecosystem-item" onclick="setKakaoAlarm()">
+                        <div class="ecosystem-icon">⏰</div>
+                        <div class="ecosystem-title">알림 설정</div>
+                        <div class="ecosystem-desc">실시간 시세</div>
+                    </div>
+                    <div class="ecosystem-item" onclick="inviteFriends()">
+                        <div class="ecosystem-icon">👥</div>
+                        <div class="ecosystem-title">친구 초대</div>
+                        <div class="ecosystem-desc">함께 투자하기</div>
+                    </div>
+                </div>
+                
+                <!-- 소셜 투자 -->
+                <div class="social-investment">
+                    <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 12px;">🏆 함께 투자하는 친구들</div>
+                    <div class="friends-list">
+                        <div class="friend-item">
+                            <div class="friend-avatar">
+                                👨
+                                <div class="friend-status online"></div>
+                            </div>
+                            <div class="friend-name">재훈</div>
+                            <div class="friend-profit">+5.2%</div>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-avatar">
+                                👩
+                                <div class="friend-status investing"></div>
+                            </div>
+                            <div class="friend-name">수진</div>
+                            <div class="friend-profit">+8.7%</div>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-avatar">
+                                🧑
+                                <div class="friend-status online"></div>
+                            </div>
+                            <div class="friend-name">민호</div>
+                            <div class="friend-profit">+3.1%</div>
+                        </div>
+                        <div class="friend-item">
+                            <div class="friend-avatar">
+                                👦
+                                <div class="friend-status investing"></div>
+                            </div>
+                            <div class="friend-name">현우</div>
+                            <div class="friend-profit">+12.4%</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 11px; color: #888; text-align: center;">실시간으로 친구들의 투자 현황을 확인하고 함께 성장하세요</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 네비게이션 -->
+        <div class="bottom-nav">
+            <div class="nav-items">
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon">🏠</div>
+                    <span>홈</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <span>투자</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">⚡</div>
+                    <span>거래</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">📰</div>
+                    <span>정보</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">👤</div>
+                    <span>내 정보</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 홈 인디케이터 -->
+        <div class="home-indicator"></div>
+    </div>
+
+    <script>
+        // 거래 탭 전환
+        document.querySelectorAll('.trade-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.trade-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // 탭에 따라 다른 종목 데이터 로드
+                const isWatchlist = tab.textContent.trim() === '관심종목';
+                loadStockData(isWatchlist);
+            });
+        });
+
+        // 트렌드 탭 전환
+        document.querySelectorAll('.trending-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.trending-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const isVolume = tab.textContent.trim() === '거래대금';
+                loadTrendingData(isVolume);
+            });
+        });
+
+        // 거래 버튼 클릭 이벤트
+        document.querySelectorAll('.trade-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const action = btn.classList.contains('buy-btn') ? '매수' : '매도';
+                const stockName = btn.closest('.stock-item').querySelector('.stock-name').textContent;
+                
+                // 실제 거래 화면으로 이동 (원클릭 거래)
+                showTradeModal(stockName, action);
+            });
+        });
+
+        // 스마트 원클릭 거래 모달
+        function showTradeModal(stockName, action) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+                padding: 20px;
+                backdrop-filter: blur(10px);
+            `;
+            
+            const isBuy = action === '매수';
+            const actionColor = isBuy ? '#ff6b6b' : '#4285f4';
+            const currentPrice = Math.floor(Math.random() * 100000) + 50000;
+            const recommendedAmount = Math.floor(currentPrice * (1 + (Math.random() - 0.5) * 0.1));
+            
+            modal.innerHTML = `
+                <div style="background: linear-gradient(145deg, #2a2a2a, #1a1a1a); border-radius: 24px; padding: 30px; max-width: 320px; width: 100%; color: white; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <div style="font-size: 24px; margin-bottom: 8px;">${stockName}</div>
+                        <div style="font-size: 32px; font-weight: 700; color: ${actionColor};">${action}</div>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <span style="color: #888;">현재가</span>
+                            <span style="font-weight: 600;">${currentPrice.toLocaleString()}원</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <span style="color: #888;">AI 추천가</span>
+                            <span style="font-weight: 600; color: #4caf50;">${recommendedAmount.toLocaleString()}원</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #888;">예상 수수료</span>
+                            <span style="font-weight: 600;">0원 <span style="color: #ffcd00; font-size: 10px;">무료</span></span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 24px;">
+                        <input type="number" placeholder="수량 입력" value="1" 
+                               style="width: 100%; padding: 16px; border-radius: 12px; border: 2px solid #444; background: #333; color: white; font-size: 16px; text-align: center; margin-bottom: 8px;">
+                        <div style="font-size: 12px; color: #888; text-align: center;">💡 AI가 적정 수량을 추천합니다</div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <button onclick="executeSmartTrade('${stockName}', '${action}')" 
+                                style="flex: 2; background: ${actionColor}; color: white; border: none; border-radius: 16px; padding: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                            ${action} 실행
+                        </button>
+                        <button onclick="document.body.removeChild(this.closest('.modal'))" 
+                                style="flex: 1; background: #666; color: white; border: none; border-radius: 16px; padding: 16px; font-size: 16px; cursor: pointer;">
+                            취소
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 16px; font-size: 11px; color: #666; text-align: center;">
+                        🔒 카카오페이 간편결제로 안전하게 거래됩니다
+                    </div>
+                </div>
+            `;
+            modal.classList.add('modal');
+            document.body.appendChild(modal);
+        }
+
+        // 스마트 거래 실행
+        function executeSmartTrade(stockName, action) {
+            // 모달 닫기
+            document.querySelector('.modal')?.remove();
+            
+            // 거래 실행 피드백
+            showSmartAlert('거래 완료!', `${stockName} ${action} 주문이 체결되었습니다`, 'profit');
+            
+            // 포트폴리오 업데이트 시뮬레이션
+            setTimeout(() => {
+                updateRealTimeData();
+                showSmartAlert('포트폴리오 업데이트', '보유 종목이 업데이트되었습니다', 'info');
+            }, 2000);
+            
+            console.log(`스마트 거래 실행: ${stockName} ${action}`);
+        }
+
+        // 데이터 로딩 함수들
+        function loadStockData(isWatchlist) {
+            console.log(`${isWatchlist ? '관심종목' : '보유종목'} 데이터 로딩`);
+            // 실제 구현에서는 API 호출
+        }
+
+        function loadTrendingData(isVolume) {
+            console.log(`${isVolume ? '거래대금' : '인기종목'} 트렌드 데이터 로딩`);
+            // 실제 구현에서는 실시간 데이터 API 호출
+        }
+
+        // 미션 클릭 이벤트
+        document.querySelectorAll('.mission-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const missionTitle = item.querySelector('.mission-title').textContent;
+                alert(`"${missionTitle}" 미션을 시작합니다!`);
+            });
+        });
+
+        // 뉴스 클릭 이벤트
+        document.querySelectorAll('.news-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const newsTitle = item.querySelector('.news-title').textContent;
+                alert(`"${newsTitle}" 기사를 읽으러 갑니다.`);
+            });
+        });
+
+        // 실시간 데이터 업데이트
+        function updateRealTimeData() {
+            // 포트폴리오 수익률 업데이트
+            const profitElements = document.querySelectorAll('.profit-amount');
+            const rateElements = document.querySelectorAll('.profit-rate');
+            
+            profitElements.forEach(el => {
+                const baseProfit = 247500;
+                const variation = (Math.random() - 0.5) * 10000;
+                const newProfit = Math.floor(baseProfit + variation);
+                const newRate = ((newProfit / 2600000) * 100).toFixed(2);
+                
+                el.textContent = `+${newProfit.toLocaleString()}원`;
+                if (rateElements.length > 0) {
+                    rateElements[0].textContent = `+${newRate}%`;
+                }
+            });
+
+            // 주식 가격 업데이트
+            document.querySelectorAll('.stock-chart').forEach(chart => {
+                const isPositive = Math.random() > 0.5;
+                const change = (Math.random() * 3).toFixed(1);
+                chart.textContent = `${isPositive ? '+' : '-'}${change}%`;
+                chart.className = `stock-chart ${isPositive ? '' : 'red'}`;
+            });
+        }
+
+        // 스크롤 애니메이션
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('animate-in')) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        // 모든 섹션에 애니메이션 적용
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // 하단 네비게이션 클릭
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                
+                const navText = item.querySelector('span').textContent;
+                console.log(`${navText} 페이지로 이동`);
+            });
+        });
+
+        // 5초마다 실시간 데이터 업데이트
+        setInterval(updateRealTimeData, 5000);
+
+        // 카카오 생태계 연동 기능들
+        function shareToKakaoTalk() {
+            const profit = '+247,500원 (+9.54%)';
+            alert(`카카오톡으로 공유: "오늘 투자 수익 ${profit} 달성! 🎉"\n(실제로는 카카오톡 앱으로 공유됩니다)`);
+        }
+
+        function connectKakaoPay() {
+            alert('카카오페이 연결하기\n• 간편한 입출금\n• 자동 투자 설정\n• 수수료 할인 혜택\n\n(실제로는 카카오페이 연동 페이지로 이동됩니다)');
+        }
+
+        function setKakaoAlarm() {
+            alert('카카오톡 알림 설정\n• 주가 변동 알림\n• 투자 목표 달성 알림\n• 친구들의 투자 현황\n\n(실제로는 알림 설정 페이지로 이동됩니다)');
+        }
+
+        function inviteFriends() {
+            alert('친구 초대하기\n• 카카오톡으로 초대장 발송\n• 함께 투자 챌린지 참여\n• 추천인 혜택 제공\n\n(실제로는 친구 초대 페이지로 이동됩니다)');
+        }
+
+        // 실시간 알림 시스템
+        function showSmartAlert(title, message, type = 'info') {
+            const alertContainer = document.createElement('div');
+            alertContainer.style.cssText = `
+                position: fixed;
+                top: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                max-width: 350px;
+                z-index: 2000;
+                pointer-events: none;
+            `;
+            
+            const alertItem = document.createElement('div');
+            alertItem.style.cssText = `
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 12px;
+                padding: 16px;
+                color: white;
+                margin-bottom: 8px;
+                animation: slideDown 0.5s ease-out;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                pointer-events: auto;
+                cursor: pointer;
+            `;
+            
+            const icons = {
+                'profit': '🎉',
+                'warning': '⚠️',
+                'friend': '👥',
+                'info': 'ℹ️'
+            };
+            
+            alertItem.innerHTML = `
+                <div style="font-size: 24px; flex-shrink: 0;">${icons[type] || icons.info}</div>
+                <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">${title}</div>
+                    <div style="font-size: 12px; opacity: 0.9;">${message}</div>
+                </div>
+                <button onclick="this.closest('.alert-container').remove()" 
+                        style="background: none; border: none; color: white; font-size: 18px; cursor: pointer; opacity: 0.7;">×</button>
+            `;
+            
+            alertContainer.className = 'alert-container';
+            alertContainer.appendChild(alertItem);
+            document.body.appendChild(alertContainer);
+            
+            // 5초 후 자동 제거
+            setTimeout(() => {
+                if (document.body.contains(alertContainer)) {
+                    alertContainer.remove();
+                }
+            }, 5000);
+        }
+
+        // 스마트 알림 데모
+        function triggerSmartAlerts() {
+            setTimeout(() => showSmartAlert('목표 달성!', '이번 주 투자 목표 73% 달성했습니다', 'profit'), 3000);
+            setTimeout(() => showSmartAlert('친구 알림', '수진님이 테슬라 매수했습니다', 'friend'), 8000);
+            setTimeout(() => showSmartAlert('시장 분석', '현재 보유 종목 상승 추세입니다', 'info'), 13000);
+        }
+
+        // 초기 데이터 로드
+        document.addEventListener('DOMContentLoaded', () => {
+            updateRealTimeData();
+            triggerSmartAlerts(); // 스마트 알림 데모 시작
+            console.log('TO-BE 카카오 페이증권 홈 화면 로드 완료! 🎉');
+            console.log('새로운 기능들:');
+            console.log('✅ 실시간 미니 차트');
+            console.log('✅ AI 기반 개인화 추천');
+            console.log('✅ 소셜 투자 기능');
+            console.log('✅ 카카오 생태계 연동');
+            console.log('✅ 주간 랭킹 시스템');
+            console.log('✅ 스마트 알림 시스템');
+        });
+
+        // 터치 피드백
+        document.querySelectorAll('button, .stock-item, .mission-item, .news-item').forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

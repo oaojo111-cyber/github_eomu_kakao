@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>정규장 데이마켓</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            line-height: 1.4;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 390px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* 상태바 영역 */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px 0;
+            font-size: 16px;
+            font-weight: 600;
+            height: 44px;
+        }
+        
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .status-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .battery {
+            background: #ffffff;
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        /* 헤더 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .logo-icon {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .logo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .dot-blue {
+            background: #4285f4;
+        }
+        
+        .dot-yellow {
+            background: #ffcd00;
+        }
+        
+        .header-icons {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .icon-btn {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: none;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .notification-dot {
+            position: relative;
+        }
+        
+        .notification-dot::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 6px;
+            background: #ff6b6b;
+            border-radius: 50%;
+        }
+        
+        /* 네비게이션 탭 */
+        .nav-tabs {
+            display: flex;
+            padding: 0 20px 16px;
+            gap: 24px;
+        }
+        
+        .nav-tab {
+            color: #888;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab.active {
+            color: #ffffff;
+            border-bottom-color: #ffcd00;
+        }
+        
+        /* 프로모션 팝업 */
+        .promotion-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        
+        .promotion-popup.hidden {
+            display: none;
+        }
+        
+        .popup-content {
+            background: #2a2a2a;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 320px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .popup-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .popup-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .popup-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .popup-subtitle {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .popup-desc {
+            color: #666;
+            font-size: 12px;
+            line-height: 1.4;
+            margin-bottom: 30px;
+        }
+        
+        .popup-btn {
+            background: #ffcd00;
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            padding: 16px 0;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .popup-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* 퀴ㄱ 액션 버튼들 */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            padding: 16px 20px 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .quick-actions::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .quick-action {
+            background: #2a2a2a;
+            border-radius: 20px;
+            padding: 12px 16px;
+            white-space: nowrap;
+            font-size: 14px;
+            color: #ffffff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: fit-content;
+            transition: background 0.2s;
+        }
+        
+        .quick-action:hover {
+            background: #3a3a3a;
+        }
+        
+        .action-icon {
+            font-size: 16px;
+        }
+        
+        /* 포트폴리오 섹션 */
+        .portfolio-section {
+            padding: 24px 20px 16px;
+        }
+        
+        .portfolio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .portfolio-title {
+            font-size: 16px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .dropdown-icon {
+            font-size: 12px;
+            color: #4285f4;
+        }
+        
+        .my-account-btn {
+            background: #2a2a2a;
+            color: #ffcd00;
+            border: none;
+            border-radius: 16px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .account-notification {
+            background: #ff6b6b;
+            color: white;
+            border-radius: 10px;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .portfolio-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+        
+        /* 메뉴 그리드 */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 0 20px;
+            margin-bottom: 30px;
+        }
+        
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #ffffff;
+        }
+        
+        .menu-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 8px;
+            background: #2a2a2a;
+        }
+        
+        .menu-icon.green {
+            background: #4caf50;
+        }
+        
+        .menu-icon.orange {
+            background: #ff9800;
+        }
+        
+        .menu-icon.yellow {
+            background: #ffcd00;
+            color: #000;
+        }
+        
+        .menu-icon.red {
+            background: #f44336;
+        }
+        
+        .menu-label {
+            font-size: 12px;
+            color: #ffffff;
+            text-align: center;
+        }
+        
+        /* 추천 섹션 */
+        .recommendation-section {
+            background: #2a2a2a;
+            margin: 0 20px;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .rec-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .rec-title {
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        
+        .rec-icon {
+            font-size: 60px;
+            opacity: 0.8;
+        }
+        
+        .rec-stats {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        
+        .rec-return {
+            font-size: 16px;
+            color: #ff6b6b;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .rec-participants {
+            background: #ffffff;
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            display: inline-block;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .rec-participants::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #ffffff;
+        }
+        
+        .rec-btn {
+            background: #ffcd00;
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            padding: 14px 0;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* 해외주식 섹션 */
+        .overseas-stocks {
+            padding: 0 20px 20px;
+        }
+        
+        .stocks-grid {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .stocks-grid::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .stock-item {
+            flex-shrink: 0;
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 16px;
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .stock-item:hover {
+            background: #3a3a3a;
+        }
+        
+        .stock-logo {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .nvidia {
+            background: #76b900;
+        }
+        
+        .tesla {
+            background: #cc0000;
+        }
+        
+        .apple {
+            background: #000000;
+        }
+        
+        .coca-cola {
+            background: #ff0000;
+        }
+        
+        .stock-name {
+            font-size: 11px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+        
+        /* 하단 네비게이션 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 390px;
+            background: #1a1a1a;
+            border-top: 1px solid #2a2a2a;
+            padding: 8px 0 30px;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #888;
+            font-size: 10px;
+            position: relative;
+        }
+        
+        .nav-item.active {
+            color: #ffcd00;
+        }
+        
+        .nav-item .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-item .notification-dot::after {
+            top: -2px;
+            right: -2px;
+        }
+        
+        /* 홈 인디케이터 */
+        .home-indicator {
+            position: fixed;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: #ffffff;
+            border-radius: 2.5px;
+        }
+        
+        /* 애니메이션 */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-up {
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        /* 반응형 */
+        @media (max-width: 350px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .header, .nav-tabs, .portfolio-section, 
+            .menu-grid, .overseas-stocks {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+            
+            .recommendation-section {
+                margin-left: 16px;
+                margin-right: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 상태바 -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span>10:09</span>
+                <span>🔇</span>
+            </div>
+            <div class="status-right">
+                <span>••••</span>
+                <span>5G</span>
+                <div class="battery">94</div>
+            </div>
+        </div>
+
+        <!-- 헤더 -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <div class="logo-dot dot-blue"></div>
+                    <div class="logo-dot dot-yellow"></div>
+                </div>
+                <span>정규장</span>
+                <span style="color: #4285f4;">🏢</span>
+                <span>데이마켓</span>
+            </div>
+            <div class="header-icons">
+                <button class="icon-btn">🔍</button>
+                <button class="icon-btn notification-dot">🔔</button>
+                <button class="icon-btn">☰</button>
+            </div>
+        </header>
+
+        <!-- 네비게이션 탭 -->
+        <nav class="nav-tabs">
+            <a href="#" class="nav-tab active">증권톡</a>
+            <a href="#" class="nav-tab">관심</a>
+            <a href="#" class="nav-tab">발견</a>
+            <a href="#" class="nav-tab">더보기</a>
+        </nav>
+
+        <!-- 빠른 액션 버튼들 -->
+        <div class="quick-actions">
+            <a href="#" class="quick-action">
+                <span class="action-icon">🇺🇸</span>
+                <span>미국주식업선</span>
+            </a>
+            <a href="#" class="quick-action">
+                <span class="action-icon">📈</span>
+                <span>실시간상승</span>
+            </a>
+            <a href="#" class="quick-action">
+                <span class="action-icon">💰</span>
+                <span>모으기수수료0%</span>
+            </a>
+            <a href="#" class="quick-action">
+                <span class="action-icon">🌟</span>
+                <span>AI추천</span>
+            </a>
+        </div>
+
+        <!-- 포트폴리오 섹션 -->
+        <div class="portfolio-section animate-up">
+            <div class="portfolio-header">
+                <div class="portfolio-title">
+                    보유주식
+                    <span style="color: #4285f4;">종합계좌</span>
+                    <span class="dropdown-icon">▼</span>
+                </div>
+                <button class="my-account-btn">
+                    내 계좌
+                    <span class="account-notification">N</span>
+                </button>
+            </div>
+            <div class="portfolio-value">0원</div>
+        </div>
+
+        <!-- 메뉴 그리드 -->
+        <div class="menu-grid animate-up">
+            <a href="#" class="menu-item">
+                <div class="menu-icon green">📄</div>
+                <div class="menu-label">주문내역</div>
+            </a>
+            <a href="#" class="menu-item">
+                <div class="menu-icon orange">📊</div>
+                <div class="menu-label">매매일지</div>
+            </a>
+            <a href="#" class="menu-item">
+                <div class="menu-icon yellow">🪙</div>
+                <div class="menu-label">받은배당</div>
+            </a>
+            <a href="#" class="menu-item">
+                <div class="menu-icon red">📈</div>
+                <div class="menu-label">모으기</div>
+            </a>
+        </div>
+
+        <!-- 엔비디아 추천 섹션 -->
+        <div class="recommendation-section animate-up">
+            <div class="rec-header">
+                <div>
+                    <div class="rec-title">엔비디아<br>모아볼까요?</div>
+                </div>
+                <div class="rec-icon">🐷</div>
+            </div>
+            <div class="rec-stats">1년 전보다</div>
+            <div class="rec-return">▲42.30%</div>
+            <div class="rec-participants">793,674명이 모으고 있어요</div>
+            <button class="rec-btn">모으기</button>
+        </div>
+
+        <!-- 해외주식 섹션 -->
+        <div class="overseas-stocks">
+            <div class="stocks-grid">
+                <div class="stock-item">
+                    <div class="stock-logo nvidia">💚</div>
+                    <div class="stock-name">엔비디아</div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-logo tesla">🚗</div>
+                    <div class="stock-name">테슬라</div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-logo apple">🍎</div>
+                    <div class="stock-name">애플</div>
+                </div>
+                <div class="stock-item">
+                    <div class="stock-logo coca-cola">🥤</div>
+                    <div class="stock-name">코카콜라</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 프로모션 팝업 -->
+        <div class="promotion-popup" id="promotionPopup">
+            <div class="popup-content">
+                <button class="popup-close" onclick="closePopup()">×</button>
+                <div class="popup-icon">💸</div>
+                <div class="popup-title">최대 백만원 상금 받기</div>
+                <div class="popup-subtitle">좋아요 댓글 팔로우하면 돼려요</div>
+                <div class="popup-desc">투자 전 설명 청취 및 설명확인서 필독, 원금손실 발생 시 투자자 귀책</div>
+                <button class="popup-btn" onclick="closePopup()">받으러 가기</button>
+            </div>
+        </div>
+
+        <!-- 하단 네비게이션 -->
+        <div class="bottom-nav">
+            <div class="nav-items">
+                <a href="#" class="nav-item active">
+                    <div class="nav-icon notification-dot">🏠</div>
+                    <span>홈</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">📋</div>
+                    <span>체결</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">🎯</div>
+                    <span>결제</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">📰</div>
+                    <span>자산</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <div class="nav-icon">📊</div>
+                    <span>증권</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 홈 인디케이터 -->
+        <div class="home-indicator"></div>
+    </div>
+
+    <script>
+        // 팝업 제어
+        function closePopup() {
+            document.getElementById('promotionPopup').classList.add('hidden');
+        }
+
+        // 자동 팝업 표시 (3초 후)
+        setTimeout(() => {
+            document.getElementById('promotionPopup').classList.remove('hidden');
+        }, 3000);
+
+        // 퀵 액션 클릭 이벤트
+        document.querySelectorAll('.quick-action').forEach(action => {
+            action.addEventListener('click', (e) => {
+                e.preventDefault();
+                const actionName = e.currentTarget.textContent.trim();
+                console.log(`${actionName} 클릭됨`);
+                // 실제 앱에서는 해당 페이지로 네비게이션
+            });
+        });
+
+        // 메뉴 아이템 클릭 이벤트
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const menuName = item.querySelector('.menu-label').textContent;
+                alert(`${menuName} 페이지로 이동합니다.`);
+            });
+        });
+
+        // 해외주식 클릭 이벤트
+        document.querySelectorAll('.stock-item').forEach(stock => {
+            stock.addEventListener('click', () => {
+                const stockName = stock.querySelector('.stock-name').textContent;
+                alert(`${stockName} 상세 페이지로 이동합니다.`);
+            });
+        });
+
+        // 모으기 버튼 클릭
+        document.querySelector('.rec-btn').addEventListener('click', () => {
+            alert('엔비디아 모으기 페이지로 이동합니다.');
+        });
+
+        // 내 계좌 버튼 클릭
+        document.querySelector('.my-account-btn').addEventListener('click', () => {
+            alert('내 계좌 페이지로 이동합니다.');
+        });
+
+        // 네비게이션 탭 클릭
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // 하단 네비게이션 클릭
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        // 터치 효과 추가
+        document.querySelectorAll('button, .quick-action, .menu-item, .stock-item').forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.95)';
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // 스크롤 애니메이션
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('animate-up')) {
+                    entry.target.classList.add('animate-up');
+                }
+            });
+        }, observerOptions);
+
+        // 애니메이션 대상 요소들 관찰
+        document.querySelectorAll('.portfolio-section, .menu-grid, .recommendation-section').forEach(el => {
+            observer.observe(el);
+        });
+
+        // 실시간 데이터 업데이트 시뮬레이션 (실제 앱에서는 WebSocket 사용)
+        function updateRealTimeData() {
+            // 수익률 업데이트
+            const returnElement = document.querySelector('.rec-return');
+            if (returnElement) {
+                const baseReturn = 42.30;
+                const variation = (Math.random() - 0.5) * 0.5;
+                const newReturn = (baseReturn + variation).toFixed(2);
+                returnElement.textContent = `▲${newReturn}%`;
+            }
+            
+            // 참여자 수 업데이트
+            const participantsElement = document.querySelector('.rec-participants');
+            if (participantsElement) {
+                const baseCount = 793674;
+                const variation = Math.floor(Math.random() * 100);
+                const newCount = (baseCount + variation).toLocaleString();
+                participantsElement.textContent = `${newCount}명이 모으고 있어요`;
+            }
+        }
+
+        // 5초마다 실시간 데이터 업데이트
+        setInterval(updateRealTimeData, 5000);
+    </script>
+</body>
+</html>
